@@ -1,0 +1,269 @@
+.leadership-page {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    padding: 40px 20px;
+}
+
+.leadership-header {
+    text-align: center;
+    margin-bottom: 60px;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.leadership-header h1 {
+    font-size: 3rem;
+    color: #1a3a52;
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+.leadership-header p {
+    font-size: 1.2rem;
+    color: #666;
+}
+
+.leadership-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.leadership-section {
+    background: white;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.section-toggle {
+    width: 100%;
+    padding: 25px 30px;
+    border: none;
+    background: white;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background-color 0.3s;
+}
+
+.section-toggle:hover {
+    background-color: #f5f5f5;
+}
+
+.section-toggle h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: #1a3a52;
+    text-align: left;
+}
+
+.toggle-icon {
+    color: #667eea;
+    display: flex;
+    align-items: center;
+}
+
+/* State Level Cards - Blue gradient */
+.leaders-grid.state {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 30px;
+    background: linear-gradient(to bottom, #f9fafb, #ffffff);
+}
+
+/* LG Level Cards - Green gradient */
+.leaders-grid.local_government {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 30px;
+    background: linear-gradient(to bottom, #f0fdf4, #ffffff);
+}
+
+/* Ward Level Cards - Purple gradient */
+.leaders-grid.ward {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 30px;
+    background: linear-gradient(to bottom, #faf5ff, #ffffff);
+}
+
+/* Card Styles */
+.leadership-card {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s;
+    border-left: 4px solid #667eea;
+}
+
+.leadership-card.state-level {
+    border-left-color: #3b82f6;
+}
+
+.leadership-card.state-level:hover {
+    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.2);
+}
+
+.leadership-card.lg-level {
+    border-left-color: #10b981;
+}
+
+.leadership-card.lg-level:hover {
+    box-shadow: 0 8px 20px rgba(16, 185, 129, 0.2);
+}
+
+.leadership-card.ward-level {
+    border-left-color: #8b5cf6;
+}
+
+.leadership-card.ward-level:hover {
+    box-shadow: 0 8px 20px rgba(139, 92, 246, 0.2);
+}
+
+.leadership-card:hover {
+    transform: translateY(-4px);
+}
+
+.card-image {
+    width: 100%;
+    height: 200px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.card-image .placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-size: 2.5rem;
+    font-weight: bold;
+}
+
+.card-body {
+    padding: 20px;
+}
+
+.card-body h3 {
+    margin: 0 0 8px 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1a3a52;
+}
+
+.card-body .role {
+    margin: 5px 0;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #667eea;
+}
+
+.card-body .location {
+    margin: 8px 0;
+    font-size: 0.85rem;
+    color: #666;
+}
+
+.card-body .ward {
+    margin: 5px 0;
+    font-size: 0.85rem;
+    color: #999;
+}
+
+.card-body .bio {
+    margin: 10px 0 0 0;
+    font-size: 0.85rem;
+    color: #666;
+    line-height: 1.5;
+}
+
+.no-leaders {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px 20px;
+    color: #999;
+    font-size: 1.1rem;
+}
+
+.loading-page {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: #667eea;
+}
+
+@media (max-width: 768px) {
+    .leadership-header h1 {
+        font-size: 2rem;
+    }
+
+    .leadership-header p {
+        font-size: 1rem;
+    }
+
+    .leaders-grid.state,
+    .leaders-grid.local_government,
+    .leaders-grid.ward {
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 15px;
+        padding: 20px;
+    }
+
+    .section-toggle {
+        padding: 18px 20px;
+    }
+
+    .section-toggle h2 {
+        font-size: 1.2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .leadership-page {
+        padding: 20px 10px;
+    }
+
+    .leadership-header h1 {
+        font-size: 1.5rem;
+    }
+
+    .leaders-grid.state,
+    .leaders-grid.local_government,
+    .leaders-grid.ward {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        padding: 15px;
+    }
+
+    .card-image {
+        height: 140px;
+    }
+
+    .card-body {
+        padding: 15px;
+    }
+
+    .card-body h3 {
+        font-size: 1rem;
+    }
+}

@@ -1,0 +1,176 @@
+.template-guide {
+    background-color: #f0f9ff;
+    border: 2px solid #0284c7;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+}
+
+.guide-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 15px;
+    color: #0284c7;
+}
+
+.guide-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.guide-intro {
+    color: #374151;
+    margin-bottom: 15px;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.guide-table-wrapper {
+    overflow-x: auto;
+    margin-bottom: 20px;
+    border-radius: 6px;
+    border: 1px solid #cbd5e1;
+}
+
+.guide-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+}
+
+.guide-table thead {
+    background-color: #0284c7;
+    color: white;
+}
+
+.guide-table th {
+    padding: 12px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.guide-table td {
+    padding: 12px;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 0.9rem;
+}
+
+.guide-table tbody tr:hover {
+    background-color: #f9fafb;
+}
+
+.col-name {
+    font-weight: 500;
+    color: #1f2937;
+}
+
+.col-example {
+    color: #6b7280;
+    font-family: monospace;
+    font-size: 0.85rem;
+}
+
+.required-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.required-badge.required {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+.required-badge.optional {
+    background-color: #dbeafe;
+    color: #0c4a6e;
+}
+
+.guide-tips {
+    background-color: white;
+    padding: 15px;
+    border-radius: 6px;
+    border-left: 4px solid #10b981;
+}
+
+.guide-tips h4 {
+    margin: 0 0 10px 0;
+    color: #059669;
+    font-size: 1rem;
+}
+
+.guide-tips ul {
+    margin: 0;
+    padding-left: 20px;
+    list-style-type: disc;
+}
+
+.guide-tips li {
+    margin-bottom: 8px;
+    color: #374151;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .template-guide {
+        padding: 15px;
+        margin: 15px 0;
+    }
+
+    .guide-header {
+        gap: 8px;
+    }
+
+    .guide-header h3 {
+        font-size: 1rem;
+    }
+
+    .guide-table {
+        font-size: 0.85rem;
+    }
+
+    .guide-table th,
+    .guide-table td {
+        padding: 8px;
+    }
+
+    .guide-tips {
+        padding: 12px;
+    }
+
+    .guide-tips li {
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .template-guide {
+        padding: 12px;
+        margin: 10px 0;
+    }
+
+    .guide-intro {
+        font-size: 0.9rem;
+    }
+
+    .guide-table th,
+    .guide-table td {
+        padding: 6px;
+        font-size: 0.75rem;
+    }
+
+    .col-example {
+        font-size: 0.75rem;
+    }
+
+    .required-badge {
+        padding: 3px 6px;
+        font-size: 0.7rem;
+    }
+}
