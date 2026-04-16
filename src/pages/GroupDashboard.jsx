@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import './GroupDashboard.css'
 import { Edit2, LogOut, Users, FileText, Download, Upload, Trash2 } from 'lucide-react'
+import { getAuthHeader, getAuthToken, hasAuthToken, debugAuthStorage, clearAuthToken } from '../utils/authUtils'
 
 const API_BASE = 'http://localhost:8000/api/auth'
 
@@ -55,7 +56,10 @@ export default function GroupDashboard() {
     }
 
     useEffect(() => {
-        if (!localStorage.getItem('authToken')) {
+        debugAuthStorage()
+
+        if (!hasAuthToken()) {
+            console.warn('⚠️ No valid auth token found, redirecting to login')
             navigate('/login')
             return
         }
@@ -109,11 +113,7 @@ export default function GroupDashboard() {
     }
 
     const handleLogout = () => {
-        localStorage.removeItem('authToken')
-        localStorage.removeItem('user')
-        localStorage.removeItem('userType')
-        localStorage.removeItem('userRole')
-        localStorage.removeItem('userPassword')
+        clearAuthToken()
         navigate('/login')
     }
 
@@ -168,13 +168,28 @@ export default function GroupDashboard() {
 
         setCertificateLoading(true)
         try {
+            const token = getAuthToken()
+            const authHeader = getAuthHeader()
+
+            console.log('📥 Attempting certificate download...')
+            console.log('Token info:', {
+                hasToken: !!token,
+                tokenLength: token?.length,
+                authHeader: authHeader?.substring(0, 30) + '...' || 'empty'
+            })
+
             const response = await axios.post(
                 `${API_BASE}/groups/download_certificate/`,
                 {
                     group_id: groupId,
                     password: resetPinInput
                 },
-                { responseType: 'blob' }
+                {
+                    responseType: 'blob',
+                    headers: {
+                        'Authorization': authHeader
+                    }
+                }
             )
 
             const url = window.URL.createObjectURL(new Blob([response.data]))
@@ -186,7 +201,19 @@ export default function GroupDashboard() {
             link.parentNode.removeChild(link)
             window.URL.revokeObjectURL(url)
         } catch (error) {
-            const errorMsg = error.response?.data?.message || 'Failed to download certificate'
+            console.error('Certificate download error:', error)
+            console.error('Error response:', error.response?.data)
+
+            // Better error message handling
+            let errorMsg = 'Failed to download certificate'
+            if (error.response?.data?.detail) {
+                errorMsg = error.response.data.detail
+            } else if (error.response?.data?.message) {
+                errorMsg = error.response.data.message
+            } else if (error.response?.status === 401) {
+                errorMsg = 'Authentication failed. Your session may have expired. Please log in again.'
+            }
+
             setMessage({ type: 'error', text: errorMsg })
         } finally {
             setCertificateLoading(false)
@@ -629,10 +656,10 @@ export default function GroupDashboard() {
                             </div>
 
                             {/* Reset PIN Generation Section */}
-                            {userRole === 'chairman' && (
+                            {(userRole === 'chairman' || userRole === 'secretary') && (
                                 <div className="group-card reset-pin-section">
                                     <h3>Reset PIN Management</h3>
-                                    <p className="subtitle">Generate a new reset PIN for making changes to group dashboard</p>
+                                    <p className="subtitle">Generate or update your reset PIN for making changes to group dashboard, managing members, and downloading certificates</p>
                                     {!showGeneratePinForm ? (
                                         <button
                                             className="btn-primary"
@@ -645,37 +672,63 @@ export default function GroupDashboard() {
                                             {generatePinStep === 'desire' && (
                                                 <>
                                                     <div className="form-group">
-                                                        <label>Enter Desired PIN (6 digits)</label>
+                                                        <label>Enter Your 6-Digit Reset PIN *</label>
                                                         <input
-                                                            type="password"
+                                                            type="text"
                                                             value={desiredPin}
-                                                            onChange={(e) => setDesiredPin(e.target.value.slice(0, 6))}
-                                                            placeholder="6 digits"
+                                                            onChange={(e) => {
+                                                                const val = e.target.value.replace(/\D/g, '').slice(0, 6)
+                                                                setDesiredPin(val)
+                                                            }}
+                                                            placeholder="Enter 6 digits (e.g., 654321)"
                                                             maxLength="6"
                                                             required
+                                                            pattern="\d{6}"
+                                                            disabled={generatePinLoading}
                                                         />
-                                                        <p className="help-text">An OTP will be sent to both chairman and secretary emails</p>
+                                                        {desiredPin && desiredPin.length !== 6 && (
+                                                            <small style={{ color: '#e74c3c', display: 'block', marginTop: '4px' }}>
+                                                                ⚠️ PIN must be exactly 6 digits ({desiredPin.length}/6)
+                                                            </small>
+                                                        )}
+                                                        <small style={{ color: '#7f8c8d', display: 'block', marginTop: '8px' }}>
+                                                            ℹ️ An OTP will be sent to both chairman and secretary emails. Valid for 10 minutes.
+                                                        </small>
                                                     </div>
                                                 </>
                                             )}
                                             {generatePinStep === 'otp' && (
                                                 <>
                                                     <div className="form-group">
-                                                        <label>Enter OTP (check your email)</label>
+                                                        <label>Enter OTP Sent to Your Email *</label>
                                                         <input
                                                             type="text"
                                                             value={otpInput}
-                                                            onChange={(e) => setOtpInput(e.target.value.slice(0, 6))}
-                                                            placeholder="6 digit OTP"
+                                                            onChange={(e) => {
+                                                                const val = e.target.value.replace(/\D/g, '').slice(0, 6)
+                                                                setOtpInput(val)
+                                                            }}
+                                                            placeholder="Enter 6-digit OTP"
                                                             maxLength="6"
+                                                            autoFocus
                                                             required
+                                                            pattern="\d{6}"
+                                                            disabled={generatePinLoading}
                                                         />
+                                                        {otpInput && otpInput.length !== 6 && (
+                                                            <small style={{ color: '#e74c3c', display: 'block', marginTop: '4px' }}>
+                                                                ⚠️ OTP must be exactly 6 digits ({otpInput.length}/6)
+                                                            </small>
+                                                        )}
+                                                        <small style={{ color: '#7f8c8d', display: 'block', marginTop: '8px' }}>
+                                                            ℹ️ Check your registered email for the OTP. If you don't receive it, check your spam folder.
+                                                        </small>
                                                     </div>
                                                 </>
                                             )}
                                             <div className="form-actions">
                                                 <button type="submit" disabled={generatePinLoading} className="btn-primary">
-                                                    {generatePinLoading ? 'Processing...' : (generatePinStep === 'desire' ? 'Send OTP' : 'Verify OTP')}
+                                                    {generatePinLoading ? 'Processing...' : (generatePinStep === 'desire' ? 'Send OTP' : 'Verify OTP & Set PIN')}
                                                 </button>
                                                 <button
                                                     type="button"
@@ -686,6 +739,7 @@ export default function GroupDashboard() {
                                                         setDesiredPin('')
                                                         setOtpInput('')
                                                     }}
+                                                    disabled={generatePinLoading}
                                                 >
                                                     Cancel
                                                 </button>

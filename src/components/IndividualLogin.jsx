@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { LogIn } from 'lucide-react'
+import { setAuthToken, debugAuthStorage } from '../utils/authUtils'
 
 export default function IndividualLogin() {
     const navigate = useNavigate()
@@ -35,20 +36,26 @@ export default function IndividualLogin() {
                 }
             )
 
-            // Store token and user data if needed
-            localStorage.setItem('authToken', response.data.token)
+            console.log('📨 Backend response:', {
+                status: response.status,
+                hasToken: !!response.data.token,
+                token: response.data.token,
+                tokenType: typeof response.data.token,
+                hasUser: !!response.data.user,
+                fullResponse: response.data
+            })
+
+            // Store token and user data
+            setAuthToken(response.data.token)
             localStorage.setItem('user', JSON.stringify(response.data.user))
             localStorage.setItem('userType', 'individual')
 
-            setMessage({
-                type: 'success',
-                text: 'Login successful! Redirecting...'
-            })
+            // Debug logging
+            console.log('✅ Login successful, auth data stored')
+            debugAuthStorage()
 
-            // Redirect to member dashboard
-            setTimeout(() => {
-                navigate('/member-dashboard')
-            }, 1500)
+            // Navigate immediately to member dashboard
+            navigate('/member-dashboard')
         } catch (error) {
             setMessage({
                 type: 'error',

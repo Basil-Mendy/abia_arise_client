@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { LogIn } from 'lucide-react'
+import { setAuthToken, debugAuthStorage } from '../utils/authUtils'
 
 export default function AdminLogin() {
     const navigate = useNavigate()
@@ -36,22 +37,28 @@ export default function AdminLogin() {
                 }
             )
 
+            console.log('📨 Backend response:', {
+                status: response.status,
+                hasToken: !!response.data.token,
+                token: response.data.token,
+                tokenType: typeof response.data.token,
+                hasAdmin: !!response.data.admin,
+                fullResponse: response.data
+            })
+
             console.log('Login successful:', response.data)
 
             // Store token and admin info
-            localStorage.setItem('authToken', response.data.token)
+            setAuthToken(response.data.token)
             localStorage.setItem('admin', JSON.stringify(response.data.admin))
             localStorage.setItem('userType', 'admin')
 
-            setMessage({
-                type: 'success',
-                text: 'Admin login successful! Redirecting...'
-            })
+            // Debug logging
+            console.log('✅ Admin login successful, auth data stored')
+            debugAuthStorage()
 
-            // Redirect to admin dashboard
-            setTimeout(() => {
-                navigate('/admin-dashboard')
-            }, 1500)
+            // Navigate immediately to admin dashboard
+            navigate('/admin-dashboard')
         } catch (error) {
             // Log the full error for debugging
             console.error('Admin login error:', {

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { LogIn } from 'lucide-react'
+import { setAuthToken, debugAuthStorage } from '../utils/authUtils'
 
 export default function GroupLogin() {
     const navigate = useNavigate()
@@ -35,21 +36,27 @@ export default function GroupLogin() {
                 }
             )
 
+            console.log('📨 Backend response:', {
+                status: response.status,
+                hasToken: !!response.data.token,
+                token: response.data.token,
+                tokenType: typeof response.data.token,
+                hasUser: !!response.data.user,
+                fullResponse: response.data
+            })
+
             // Store token and user data
-            localStorage.setItem('authToken', response.data.token)
+            setAuthToken(response.data.token)
             localStorage.setItem('user', JSON.stringify(response.data.user))
             localStorage.setItem('userType', 'group')
             localStorage.setItem('userRole', response.data.user.role)
 
-            setMessage({
-                type: 'success',
-                text: 'Login successful! Redirecting...'
-            })
+            // Debug logging
+            console.log('✅ Login successful, auth data stored')
+            debugAuthStorage()
 
-            // Redirect to group dashboard
-            setTimeout(() => {
-                navigate('/group-dashboard')
-            }, 1500)
+            // Navigate immediately to group dashboard
+            navigate('/group-dashboard')
         } catch (error) {
             setMessage({
                 type: 'error',

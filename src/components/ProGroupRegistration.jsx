@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { UserPlus, ChevronRight, ChevronLeft, AlertCircle } from 'lucide-react'
 import CertificateDisplay from './CertificateDisplay'
@@ -40,6 +41,7 @@ Click "Continue Registration" to proceed with registration.
 `
 
 export default function ProGroupRegistration({ onBack }) {
+    const navigate = useNavigate()
     const [showInstructions, setShowInstructions] = useState(true)
     const [loading, setLoading] = useState(false)
     const [registrationSuccess, setRegistrationSuccess] = useState(false)
@@ -123,6 +125,31 @@ export default function ProGroupRegistration({ onBack }) {
         }
     }
 
+    const clearForm = () => {
+        setFormData({
+            country: 'Nigeria',
+            state: '',
+            lga: '',
+            groupName: '',
+            totalMembers: '',
+            groupAddress: '',
+            resetPin: '',
+            chairmanName: '',
+            chairmanPhone: '',
+            chairmanEmail: '',
+            chairmanResidentialAddress: '',
+            chairmanPassport: null,
+            secretaryName: '',
+            secretaryPhone: '',
+            secretaryEmail: '',
+            secretaryResidentialAddress: '',
+            secretaryPassport: null,
+            logo: null
+        })
+        setSubmissionErrors({})
+        setAvailableLgas([])
+    }
+
     const handleSubmit = async (e) => {
         e.preventDefault()
         setLoading(true)
@@ -202,14 +229,30 @@ export default function ProGroupRegistration({ onBack }) {
                         document.body.removeChild(link)
 
                         setShowCertificate(true)
+
+                        // Clear form and redirect to login after 3 seconds
+                        setTimeout(() => {
+                            clearForm()
+                            navigate('/login')
+                        }, 3000)
                     } else {
                         console.warn(`⚠️ Registration successful, but certificate generation failed`)
                         alert('⚠️ Registration successful, but certificate generation failed.\n\nYou can generate it later from your dashboard.')
+                        // Clear form and redirect to login after 2 seconds
+                        setTimeout(() => {
+                            clearForm()
+                            navigate('/login')
+                        }, 2000)
                     }
                 } catch (certError) {
                     console.error('Certificate generation error:', certError)
                     console.log(`⚠️ Registration successful (License: ${groupId}), but certificate generation failed.\n\nYou can generate it later from your dashboard.`)
                     alert('⚠️ Registration successful, but certificate generation failed.\n\nYou can generate it later from your dashboard.')
+                    // Clear form and redirect to login even if certificate generation fails
+                    setTimeout(() => {
+                        clearForm()
+                        navigate('/login')
+                    }, 2000)
                 }
             }
         } catch (error) {
@@ -498,19 +541,29 @@ export default function ProGroupRegistration({ onBack }) {
                         </div>
 
                         <div className="form-group">
-                            <label htmlFor="resetPin">Reset PIN (Security Password) *</label>
+                            <label htmlFor="resetPin">Reset PIN (6 digits Security Code) *</label>
                             <input
-                                type="password"
+                                type="text"
                                 id="resetPin"
                                 name="resetPin"
                                 value={formData.resetPin}
-                                onChange={handleInputChange}
-                                placeholder="Enter 6-digit security PIN"
+                                onChange={(e) => {
+                                    const value = e.target.value.replace(/\D/g, '').slice(0, 6)
+                                    handleInputChange({ target: { name: 'resetPin', value } })
+                                }}
+                                placeholder="Enter 6 digits (e.g., 123456)"
                                 maxLength="6"
                                 required
+                                pattern="\d{6}"
+                                title="Must be exactly 6 digits"
                                 className={submissionErrors.resetPin ? 'input-error' : ''}
                             />
-                            <small style={{ color: '#6b7280', marginTop: '4px', display: 'block' }}>This PIN will be required for making changes in the group dashboard. Must be 6 digits.</small>
+                            <small style={{ color: '#6b7280', marginTop: '4px', display: 'block' }}>ℹ️ This 6-digit PIN will be required for making changes in the group dashboard, managing members, and downloading certificates.</small>
+                            {formData.resetPin && formData.resetPin.length !== 6 && (
+                                <span className="error-text" style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '5px' }}>
+                                    <AlertCircle size={16} /> PIN must be exactly 6 digits
+                                </span>
+                            )}
                             {submissionErrors.resetPin && (
                                 <span className="error-text" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                                     <AlertCircle size={16} /> {submissionErrors.resetPin}

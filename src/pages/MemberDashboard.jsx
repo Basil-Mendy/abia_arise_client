@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import './MemberDashboard.css'
 import { Download, Edit2, Lock, CreditCard, LogOut, Eye, EyeOff, Users } from 'lucide-react'
+import { getAuthHeader, getAuthToken, hasAuthToken, debugAuthStorage, clearAuthToken } from '../utils/authUtils'
 
 export default function MemberDashboard() {
     const navigate = useNavigate()
@@ -25,6 +26,16 @@ export default function MemberDashboard() {
         new_pin: '',
         confirm_pin: ''
     })
+
+    // PIN Reset with OTP states
+    const [showResetPinWithOTP, setShowResetPinWithOTP] = useState(false)
+    const [resetPinStep, setResetPinStep] = useState('password') // 'password', 'desired', 'otp'
+    const [resetPinPassword, setResetPinPassword] = useState('')
+    const [resetPinDesired, setResetPinDesired] = useState('')
+    const [resetPinOTP, setResetPinOTP] = useState('')
+    const [resetPinLoading, setResetPinLoading] = useState(false)
+    const [resetPinOtpSent, setResetPinOtpSent] = useState(false)
+
     const [bankForm, setBankForm] = useState({
         bank_account_number: '',
         bank_name: '',
@@ -44,7 +55,10 @@ export default function MemberDashboard() {
     const memberInitials = localStorage.getItem('user') ? `${JSON.parse(localStorage.getItem('user')).first_name[0]}${JSON.parse(localStorage.getItem('user')).last_name[0]}` : ''
 
     useEffect(() => {
-        if (!localStorage.getItem('authToken')) {
+        debugAuthStorage()
+
+        if (!hasAuthToken()) {
+            console.warn('⚠️ No valid auth token found, redirecting to login')
             navigate('/login')
             return
         }
@@ -134,9 +148,7 @@ export default function MemberDashboard() {
     }
 
     const handleLogout = () => {
-        localStorage.removeItem('authToken')
-        localStorage.removeItem('user')
-        localStorage.removeItem('userType')
+        clearAuthToken()
         navigate('/login')
     }
 
@@ -212,6 +224,88 @@ export default function MemberDashboard() {
         }
     }
 
+    const handleGenerateResetPinOTP = async (e) => {
+        e.preventDefault()
+        if (!resetPinPassword) {
+            setMessage({ type: 'error', text: 'Please enter your password (last 4 digits of phone)' })
+            return
+        }
+        if (!resetPinDesired || resetPinDesired.length !== 6 || !/^\d+$/.test(resetPinDesired)) {
+            setMessage({ type: 'error', text: 'New PIN must be exactly 6 digits' })
+            return
+        }
+
+        setResetPinLoading(true)
+        try {
+            const response = await axios.post(
+                'http://localhost:8000/api/auth/members/generate_reset_pin/',
+                {
+                    member_id: memberId,
+                    password: resetPinPassword,
+                    desired_pin: resetPinDesired
+                }
+            )
+            if (response.data.success) {
+                setMessage({ type: 'success', text: 'OTP sent to your email. Check your inbox.' })
+                setResetPinOtpSent(true)
+                setResetPinStep('otp')
+                // For development, if OTP is included in response
+                if (response.data.otp) {
+                    console.log(`📧 Development Mode - OTP: ${response.data.otp}`)
+                }
+            }
+        } catch (error) {
+            setMessage({ type: 'error', text: error.response?.data?.message || 'Failed to send OTP' })
+            console.error('Generate OTP error:', error)
+        } finally {
+            setResetPinLoading(false)
+        }
+    }
+
+    const handleVerifyResetPinOTP = async (e) => {
+        e.preventDefault()
+        if (!resetPinOTP || resetPinOTP.length !== 6 || !/^\d+$/.test(resetPinOTP)) {
+            setMessage({ type: 'error', text: 'OTP must be exactly 6 digits' })
+            return
+        }
+
+        setResetPinLoading(true)
+        try {
+            const response = await axios.post(
+                'http://localhost:8000/api/auth/members/verify_reset_pin_otp/',
+                {
+                    member_id: memberId,
+                    otp: resetPinOTP
+                }
+            )
+            if (response.data.success) {
+                setMessage({ type: 'success', text: 'PIN has been reset successfully!' })
+                setShowResetPinWithOTP(false)
+                setResetPinStep('password')
+                setResetPinPassword('')
+                setResetPinDesired('')
+                setResetPinOTP('')
+                setResetPinOtpSent(false)
+                // Refresh member data
+                setTimeout(() => fetchMemberData(), 1000)
+            }
+        } catch (error) {
+            setMessage({ type: 'error', text: error.response?.data?.message || 'Failed to verify OTP' })
+            console.error('Verify OTP error:', error)
+        } finally {
+            setResetPinLoading(false)
+        }
+    }
+
+    const handleResetPinCancel = () => {
+        setShowResetPinWithOTP(false)
+        setResetPinStep('password')
+        setResetPinPassword('')
+        setResetPinDesired('')
+        setResetPinOTP('')
+        setResetPinOtpSent(false)
+    }
+
     const handleUpdateProfilePicture = async (e) => {
         e.preventDefault()
         if (!profilePictureFile) {
@@ -257,9 +351,11 @@ export default function MemberDashboard() {
 
     const downloadIDCard = () => {
         if (idCard) {
+            const token = localStorage.getItem('authToken')
             const link = document.createElement('a')
             link.href = `http://localhost:8000${idCard}`
             link.download = `ID_Card_${memberId}.png`
+            link.setAttribute('Authorization', `Bearer ${token}`)
             document.body.appendChild(link)
             link.click()
             document.body.removeChild(link)
@@ -697,7 +793,110 @@ export default function MemberDashboard() {
                                 </div>
 
                                 <div className="security-section">
-                                    <h3>Reset Your PIN</h3>
+                                    <h3>Reset Your PIN (With Email Verification)</h3>
+                                    <p className="hint">Secure way to reset your PIN using OTP sent to your email.</p>
+
+                                    {!showResetPinWithOTP ? (
+                                        <button
+                                            className="btn-primary"
+                                            onClick={() => setShowResetPinWithOTP(true)}
+                                        >
+                                            <Lock size={16} /> Reset PIN with OTP
+                                        </button>
+                                    ) : (
+                                        <form onSubmit={resetPinStep === 'otp' ? handleVerifyResetPinOTP : handleGenerateResetPinOTP} className="edit-form">
+                                            {resetPinStep === 'password' && (
+                                                <>
+                                                    <div className="form-group">
+                                                        <label>Enter Your Password (Last 4 Digits of Phone) *</label>
+                                                        <input
+                                                            type="password"
+                                                            placeholder="Enter password"
+                                                            value={resetPinPassword}
+                                                            onChange={(e) => setResetPinPassword(e.target.value)}
+                                                            required
+                                                            disabled={resetPinLoading}
+                                                        />
+                                                    </div>
+                                                    <div className="form-group">
+                                                        <label>Enter Your New 6-Digit PIN *</label>
+                                                        <input
+                                                            type="text"
+                                                            placeholder="Enter 6 digits (e.g., 654321)"
+                                                            value={resetPinDesired}
+                                                            onChange={(e) => {
+                                                                const val = e.target.value.replace(/\D/g, '').slice(0, 6)
+                                                                setResetPinDesired(val)
+                                                            }}
+                                                            maxLength="6"
+                                                            required
+                                                            pattern="\d{6}"
+                                                            disabled={resetPinLoading}
+                                                        />
+                                                        {resetPinDesired && resetPinDesired.length !== 6 && (
+                                                            <span style={{ color: '#e74c3c', fontSize: '12px', display: 'block', marginTop: '4px' }}>
+                                                                ⚠️ PIN must be exactly 6 digits ({resetPinDesired.length}/6)
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </>
+                                            )}
+
+                                            {resetPinStep === 'otp' && (
+                                                <>
+                                                    <div className="form-group">
+                                                        <label>Enter OTP Sent to Your Email *</label>
+                                                        <input
+                                                            type="text"
+                                                            placeholder="Enter 6-digit OTP"
+                                                            value={resetPinOTP}
+                                                            onChange={(e) => {
+                                                                const val = e.target.value.replace(/\D/g, '').slice(0, 6)
+                                                                setResetPinOTP(val)
+                                                            }}
+                                                            maxLength="6"
+                                                            autoFocus
+                                                            required
+                                                            pattern="\d{6}"
+                                                            disabled={resetPinLoading}
+                                                        />
+                                                        {resetPinOTP && resetPinOTP.length !== 6 && (
+                                                            <span style={{ color: '#e74c3c', fontSize: '12px', display: 'block', marginTop: '4px' }}>
+                                                                ⚠️ OTP must be exactly 6 digits ({resetPinOTP.length}/6)
+                                                            </span>
+                                                        )}
+                                                        <small style={{ color: '#7f8c8d', marginTop: '8px', display: 'block' }}>
+                                                            ℹ️ Check your registered email for the OTP. Valid for 10 minutes.
+                                                        </small>
+                                                    </div>
+                                                </>
+                                            )}
+
+                                            <div className="form-actions">
+                                                <button
+                                                    type="submit"
+                                                    className="btn-primary"
+                                                    disabled={resetPinLoading}
+                                                >
+                                                    {resetPinLoading ? 'Processing...' : (resetPinStep === 'otp' ? 'Verify OTP & Reset PIN' : 'Continue')}
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    className="btn-secondary"
+                                                    onClick={handleResetPinCancel}
+                                                    disabled={resetPinLoading}
+                                                >
+                                                    Cancel
+                                                </button>
+                                            </div>
+                                        </form>
+                                    )}
+                                </div>
+
+                                <div className="section-divider"></div>
+
+                                <div className="security-section">
+                                    <h3>Update PIN (Traditional Method)</h3>
                                     <p className="hint">Your PIN is required to update sensitive information.</p>
 
                                     {!showPINForm ? (
@@ -705,7 +904,7 @@ export default function MemberDashboard() {
                                             className="btn-primary"
                                             onClick={() => setShowPINForm(true)}
                                         >
-                                            <Lock size={16} /> Reset PIN
+                                            <Lock size={16} /> Update PIN
                                         </button>
                                     ) : (
                                         <form onSubmit={handleUpdatePIN} className="edit-form">
@@ -805,8 +1004,8 @@ export default function MemberDashboard() {
                                     <ul className="info-list">
                                         <li>Your PIN is used to protect your sensitive information</li>
                                         <li>Default PIN is the last 4 digits of your phone number</li>
+                                        <li>PIN is required for: updating bank information, residential address, downloading ID cards, and group member management</li>
                                         <li>Keep your PIN confidential</li>
-                                        <li>You can only edit your profile picture and residential address</li>
                                     </ul>
                                 </div>
                             </div>

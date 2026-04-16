@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react'
+import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { UserPlus, ChevronRight, ChevronLeft, AlertCircle } from 'lucide-react'
 import IDCardDisplay from './IDCardDisplay'
@@ -36,6 +37,7 @@ Click "Continue Registration" to proceed.
 `
 
 export default function IndividualRegistration({ onBack }) {
+    const navigate = useNavigate()
     const [showInstructions, setShowInstructions] = useState(true)
     const [loading, setLoading] = useState(false)
     const [registrationSuccess, setRegistrationSuccess] = useState(false)
@@ -77,6 +79,7 @@ export default function IndividualRegistration({ onBack }) {
         electoralWard: '',
         pollingUnit: '',
         membershipPurpose: '',
+        resetPin: '',
         profilePicture: null
     })
 
@@ -229,6 +232,35 @@ export default function IndividualRegistration({ onBack }) {
         }
     }
 
+    const clearForm = () => {
+        setFormData({
+            nin: '',
+            votersCardNo: '',
+            firstName: '',
+            middleName: '',
+            lastName: '',
+            email: '',
+            phoneNumber: '',
+            age: '',
+            gender: '',
+            occupation: '',
+            countryOfOrigin: 'Nigeria',
+            stateOfOrigin: '',
+            lgaOfOrigin: '',
+            lgaOfOriginAcronym: '',
+            countryOfResidence: 'Nigeria',
+            stateOfResidence: '',
+            lgaOfResidence: '',
+            lgaOfResidenceAcronym: '',
+            electoralWard: '',
+            pollingUnit: '',
+            membershipPurpose: '',
+            profilePicture: null
+        })
+        setSubmissionErrors({})
+        setDuplicateErrors({ nin: null, votersCardNo: null, email: null, phoneNumber: null })
+    }
+
     const handleSubmit = async (e) => {
         e.preventDefault()
         setLoading(true)
@@ -256,6 +288,7 @@ export default function IndividualRegistration({ onBack }) {
             formDataToSend.append('electoral_ward', formData.electoralWard)
             formDataToSend.append('polling_unit', formData.pollingUnit)
             formDataToSend.append('membership_purpose', formData.membershipPurpose)
+            formDataToSend.append('pin', formData.resetPin)
             if (formData.profilePicture) {
                 formDataToSend.append('profile_picture', formData.profilePicture)
             }
@@ -306,14 +339,30 @@ export default function IndividualRegistration({ onBack }) {
                         document.body.removeChild(link)
 
                         setShowIDCard(true)
+
+                        // Clear form and redirect to login after 3 seconds
+                        setTimeout(() => {
+                            clearForm()
+                            navigate('/login')
+                        }, 3000)
                     } else {
                         console.warn(`⚠️ Registration successful, but ID card generation failed`)
                         alert('⚠️ Registration successful, but ID card generation failed.\n\nYou can generate it later from your dashboard.')
+                        // Clear form and redirect to login after 2 seconds
+                        setTimeout(() => {
+                            clearForm()
+                            navigate('/login')
+                        }, 2000)
                     }
                 } catch (idCardError) {
                     console.error('ID card generation error:', idCardError)
                     console.log(`⚠️ Registration successful (ID: ${memberId}), but ID card generation failed.\n\nYou can generate it later from your dashboard.`)
                     alert('⚠️ Registration successful, but ID card generation failed.\n\nYou can generate it later from your dashboard.')
+                    // Clear form and redirect to login even if ID card generation fails
+                    setTimeout(() => {
+                        clearForm()
+                        navigate('/login')
+                    }, 2000)
                 }
             }
         } catch (error) {
@@ -895,6 +944,37 @@ export default function IndividualRegistration({ onBack }) {
                                 rows="4"
                                 required
                             ></textarea>
+                        </div>
+                    </fieldset>
+
+                    {/* Security PIN */}
+                    <fieldset>
+                        <legend>Security PIN (6 digits)</legend>
+                        <div className="form-group">
+                            <label htmlFor="resetPin">Set Your 6-Digit Reset PIN *</label>
+                            <input
+                                type="text"
+                                id="resetPin"
+                                name="resetPin"
+                                value={formData.resetPin}
+                                onChange={(e) => {
+                                    const value = e.target.value.replace(/\D/g, '').slice(0, 6)
+                                    handleInputChange({ target: { name: 'resetPin', value } })
+                                }}
+                                placeholder="Enter 6 digits (e.g., 123456)"
+                                maxLength="6"
+                                required
+                                pattern="\d{6}"
+                                title="Must be exactly 6 digits"
+                            />
+                            <small style={{ color: '#666', marginTop: '5px', display: 'block' }}>
+                                ℹ️ This PIN will be required to make changes to your account, download ID cards, and manage group membership.
+                            </small>
+                            {formData.resetPin && formData.resetPin.length !== 6 && (
+                                <span className="error-text" style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '5px' }}>
+                                    <AlertCircle size={16} /> PIN must be exactly 6 digits
+                                </span>
+                            )}
                         </div>
                     </fieldset>
 
