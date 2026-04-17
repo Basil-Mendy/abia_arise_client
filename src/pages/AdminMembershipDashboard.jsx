@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './AdminMembershipDashboard.css';
 
-const API_BASE_URL = 'http://localhost:8000/api';
+import { getFullURL } from '../utils/apiConfig';
+
+const API_BASE_URL = getFullURL('');
 
 const AdminMembershipDashboard = () => {
     const [activeTab, setActiveTab] = useState('overview'); // overview, users, groups, audit

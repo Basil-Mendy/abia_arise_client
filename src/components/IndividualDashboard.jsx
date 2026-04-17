@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 import { User, MapPin, DollarSign, Lock, Upload, ChevronLeft, Save, AlertCircle, Download, FileText } from 'lucide-react'
+import { getFullURL, getFileURL } from '../utils/apiConfig'
 import './IndividualDashboard.css'
 
 export default function IndividualDashboard({ memberId, onLogout }) {
@@ -52,7 +53,7 @@ export default function IndividualDashboard({ memberId, onLogout }) {
         try {
             setLoading(true)
             const response = await axios.get(
-                'http://localhost:8000/api/auth/members/dashboard/',
+                getFullURL('/auth/members/dashboard/'),
                 { params: { member_id: memberId } }
             )
             if (response.data.success) {
@@ -82,7 +83,7 @@ export default function IndividualDashboard({ memberId, onLogout }) {
             setIdCardError(null)
             console.log(`[ID Card] Loading for member: ${memberId}`)
             const response = await axios.get(
-                'http://localhost:8000/api/auth/members/get_id_card/',
+                getFullURL('/auth/members/get_id_card/'),
                 { params: { member_id: memberId } }
             )
             console.log('[ID Card] API Response:', response.data)
@@ -104,7 +105,7 @@ export default function IndividualDashboard({ memberId, onLogout }) {
     const downloadIdCard = () => {
         if (idCard) {
             try {
-                const fullUrl = `http://localhost:8000${idCard}`
+                const fullUrl = getFileURL(idCard)
                 console.log('[ID Card Download] URL:', fullUrl)
                 const link = document.createElement('a')
                 link.href = fullUrl
@@ -142,7 +143,7 @@ export default function IndividualDashboard({ memberId, onLogout }) {
             formData.append('profile_picture', profilePictureFile)
 
             const response = await axios.post(
-                'http://localhost:8000/api/auth/members/update_profile_picture/',
+                getFullURL('/auth/members/update_profile_picture/'),
                 formData,
                 { headers: { 'Content-Type': 'multipart/form-data' } }
             )
@@ -166,7 +167,7 @@ export default function IndividualDashboard({ memberId, onLogout }) {
         try {
             setUpdatingResidential(true)
             const response = await axios.post(
-                'http://localhost:8000/api/auth/members/update_residential_info/',
+                getFullURL('/auth/members/update_residential_info/'),
                 {
                     member_id: memberId,
                     pin: pin,
@@ -192,7 +193,7 @@ export default function IndividualDashboard({ memberId, onLogout }) {
         try {
             setUpdatingBank(true)
             const response = await axios.post(
-                'http://localhost:8000/api/auth/members/update_bank_details/',
+                getFullURL('/auth/members/update_bank_details/'),
                 {
                     member_id: memberId,
                     pin: pin,
@@ -221,7 +222,7 @@ export default function IndividualDashboard({ memberId, onLogout }) {
         try {
             setUpdatingPin(true)
             const response = await axios.post(
-                'http://localhost:8000/api/auth/members/update_pin/',
+                getFullURL('/auth/members/update_pin/'),
                 {
                     member_id: memberId,
                     nin: pinData.nin,
@@ -495,7 +496,7 @@ export default function IndividualDashboard({ memberId, onLogout }) {
                             <div className="id-card-container" style={{ padding: '2rem', textAlign: 'center' }}>
                                 <div style={{ marginBottom: '1.5rem', borderRadius: '8px', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
                                     <img
-                                        src={`http://localhost:8000${idCard}`}
+                                        src={getFileURL(idCard)}
                                         alt="ID Card"
                                         style={{ maxWidth: '100%', height: 'auto', display: 'block' }}
                                     />

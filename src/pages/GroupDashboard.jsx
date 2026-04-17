@@ -4,8 +4,9 @@ import axios from 'axios'
 import './GroupDashboard.css'
 import { Edit2, LogOut, Users, FileText, Download, Upload, Trash2 } from 'lucide-react'
 import { getAuthHeader, getAuthToken, hasAuthToken, debugAuthStorage, clearAuthToken } from '../utils/authUtils'
+import { getFullURL, getFileURL } from '../utils/apiConfig'
 
-const API_BASE = 'http://localhost:8000/api/auth'
+const getAPI_BASE = () => getFullURL('/auth')
 
 export default function GroupDashboard() {
     const navigate = useNavigate()
@@ -83,7 +84,7 @@ export default function GroupDashboard() {
         try {
             console.log('Fetching group data for groupId:', groupId)
             const response = await axios.get(
-                `${API_BASE}/groups/dashboard/`,
+                getFullURL('/auth/groups/dashboard/'),
                 { params: { group_id: groupId } }
             )
             console.log('Group data response:', response.data)
@@ -137,7 +138,7 @@ export default function GroupDashboard() {
 
         try {
             const response = await axios.post(
-                `${API_BASE}/groups/upload_members/`,
+                getFullURL('/auth/groups/upload_members/'),
                 formData,
                 { headers: { 'Content-Type': 'multipart/form-data' } }
             )
@@ -179,7 +180,7 @@ export default function GroupDashboard() {
             })
 
             const response = await axios.post(
-                `${API_BASE}/groups/download_certificate/`,
+                getFullURL('/auth/groups/download_certificate/'),
                 {
                     group_id: groupId,
                     password: resetPinInput
@@ -231,7 +232,7 @@ export default function GroupDashboard() {
 
         try {
             const response = await axios.post(
-                `${API_BASE}/groups/delete_excel_file/`,
+                getFullURL('/auth/groups/delete_excel_file/'),
                 {
                     group_id: groupId,
                     password: resetPinInput
@@ -269,7 +270,7 @@ export default function GroupDashboard() {
 
             try {
                 const response = await axios.post(
-                    `${API_BASE}/groups/generate_reset_pin/`,
+                    getFullURL('/auth/groups/generate_reset_pin/'),
                     {
                         group_id: groupId,
                         password: userPassword,
@@ -298,7 +299,7 @@ export default function GroupDashboard() {
 
             try {
                 const response = await axios.post(
-                    `${API_BASE}/groups/verify_reset_pin_otp/`,
+                    getFullURL('/auth/groups/verify_reset_pin_otp/'),
                     {
                         group_id: groupId,
                         otp: otpInput

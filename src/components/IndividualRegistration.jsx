@@ -4,6 +4,7 @@ import axios from 'axios'
 import { UserPlus, ChevronRight, ChevronLeft, AlertCircle } from 'lucide-react'
 import IDCardDisplay from './IDCardDisplay'
 import { generateLgaAcronym, getNigerianStates, getLgasForState, getCountryOptions } from '../utils/locationUtils'
+import { getFullURL } from '../utils/apiConfig'
 import './IndividualRegistration.css'
 
 const instructionText = `
@@ -24,14 +25,14 @@ Please follow these steps:
    - Membership Purpose (reason for joining)
 
 3. After successful registration:
-   - You will receive your membership card immediately
+   - You will receive your membership ID and card immediately
    - Download and save your digital card
    - Use your Abia Arise ID and last 4 digits of phone as login credentials
 
 4. Important:
    - You cannot register with the same NIN or phone number twice
    - All information must be accurate
-   - You can update your profile picture and residential info later in your dashboard
+   - You can update your profile picture, bank details, and residential info later in your dashboard
 
 Click "Continue Registration" to proceed.
 `
@@ -182,7 +183,7 @@ export default function IndividualRegistration({ onBack }) {
                     if (name === 'phoneNumber') checkData.phone_number = value
 
                     const response = await axios.post(
-                        'http://localhost:8000/api/auth/members/check_duplicate/',
+                        getFullURL('/auth/members/check_duplicate/'),
                         JSON.stringify(checkData),
                         {
                             headers: {
@@ -295,7 +296,7 @@ export default function IndividualRegistration({ onBack }) {
 
             // Submit registration to backend
             const response = await axios.post(
-                'http://localhost:8000/api/auth/members/register/',
+                getFullURL('/auth/members/register/'),
                 formDataToSend,
                 {
                     headers: {
@@ -317,7 +318,7 @@ export default function IndividualRegistration({ onBack }) {
                 // Generate ID card
                 try {
                     const idCardResponse = await axios.post(
-                        'http://localhost:8000/api/auth/members/generate_id_card/',
+                        getFullURL('/auth/members/generate_id_card/'),
                         { member_id: memberId }
                     )
 
@@ -332,7 +333,10 @@ export default function IndividualRegistration({ onBack }) {
 
                         // Trigger download of ID card
                         const link = document.createElement('a')
-                        link.href = `http://localhost:8000${idCardResponse.data.card_url}`
+                        const baseURL = window.location.origin === 'https://abia-arise-client.vercel.app'
+                            ? 'https://abiaariseserver-production.up.railway.app'
+                            : 'http://localhost:8000'
+                        link.href = `${baseURL}${idCardResponse.data.card_url}`
                         link.download = `id_card_${memberId}.png`
                         document.body.appendChild(link)
                         link.click()

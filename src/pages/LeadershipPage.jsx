@@ -14,7 +14,7 @@ export default function LeadershipPage() {
 
     const fetchAllLeaders = async () => {
         try {
-            const response = await axios.get('http://localhost:8000/api/core/leadership/')
+            const response = await axios.get(getFullURL('/core/leadership/'))
 
             // Organize leaders by level
             const organized = {

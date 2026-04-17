@@ -28,7 +28,7 @@ export default function MemberManagement() {
     const fetchMembers = async () => {
         try {
             setLoading(true)
-            const response = await axios.get('http://localhost:8000/api/auth/members/', {
+            const response = await axios.get(getFullURL('/auth/members/'), {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem('authToken')}`
                 }
@@ -92,7 +92,7 @@ export default function MemberManagement() {
 
         try {
             await axios.patch(
-                `http://localhost:8000/api/auth/members/${memberId}/`,
+                getFullURL(`/auth/members/${memberId}/`),
                 { group_id: null },
                 {
                     headers: {

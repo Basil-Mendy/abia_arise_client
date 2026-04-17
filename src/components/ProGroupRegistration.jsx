@@ -4,6 +4,7 @@ import axios from 'axios'
 import { UserPlus, ChevronRight, ChevronLeft, AlertCircle } from 'lucide-react'
 import CertificateDisplay from './CertificateDisplay'
 import { generateLgaAcronym, getNigerianStates, getLgasForState, getCountryOptions } from '../utils/locationUtils'
+import { getFullURL } from '../utils/apiConfig'
 import './ProGroupRegistration.css'
 
 const instructionText = `
@@ -185,7 +186,7 @@ export default function ProGroupRegistration({ onBack }) {
 
             // Submit registration to backend
             const response = await axios.post(
-                'http://localhost:8000/api/auth/groups/register/',
+                getFullURL('/auth/groups/register/'),
                 data,
                 {
                     headers: {
@@ -207,7 +208,7 @@ export default function ProGroupRegistration({ onBack }) {
                 // Generate certificate
                 try {
                     const certResponse = await axios.post(
-                        'http://localhost:8000/api/auth/groups/generate_certificate/',
+                        getFullURL('/auth/groups/generate_certificate/'),
                         { group_id: groupId }
                     )
 
@@ -222,7 +223,10 @@ export default function ProGroupRegistration({ onBack }) {
 
                         // Trigger download of certificate
                         const link = document.createElement('a')
-                        link.href = `http://localhost:8000${certResponse.data.certificate_url}`
+                        const baseURL = window.location.origin === 'https://abia-arise-client.vercel.app'
+                            ? 'https://abiaariseserver-production.up.railway.app'
+                            : 'http://localhost:8000'
+                        link.href = `${baseURL}${certResponse.data.certificate_url}`
                         link.download = `certificate_${groupId}.png`
                         document.body.appendChild(link)
                         link.click()

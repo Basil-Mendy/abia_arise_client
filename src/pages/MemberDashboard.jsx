@@ -4,6 +4,7 @@ import axios from 'axios'
 import './MemberDashboard.css'
 import { Download, Edit2, Lock, CreditCard, LogOut, Eye, EyeOff, Users } from 'lucide-react'
 import { getAuthHeader, getAuthToken, hasAuthToken, debugAuthStorage, clearAuthToken } from '../utils/authUtils'
+import { getFullURL, getFileURL } from '../utils/apiConfig'
 
 export default function MemberDashboard() {
     const navigate = useNavigate()
@@ -70,7 +71,7 @@ export default function MemberDashboard() {
     const fetchMemberData = async () => {
         try {
             const response = await axios.get(
-                'http://localhost:8000/api/auth/members/dashboard/',
+                getFullURL('/auth/members/dashboard/'),
                 { params: { member_id: memberId } }
             )
             if (response.data.success) {
@@ -99,7 +100,7 @@ export default function MemberDashboard() {
     const fetchIDCard = async () => {
         try {
             const response = await axios.get(
-                'http://localhost:8000/api/auth/members/get_id_card/',
+                getFullURL('/auth/members/get_id_card/'),
                 { params: { member_id: memberId } }
             )
             if (response.data.success && response.data.id_card_url) {
@@ -122,7 +123,7 @@ export default function MemberDashboard() {
             }
 
             const response = await axios.get(
-                'http://localhost:8000/api/auth/groups/',
+                getFullURL('/auth/groups/'),
                 {
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -157,7 +158,7 @@ export default function MemberDashboard() {
         try {
             const userData = JSON.parse(localStorage.getItem('user'))
             const response = await axios.post(
-                'http://localhost:8000/api/auth/members/update_residential_info/',
+                getFullURL('/auth/members/update_residential_info/'),
                 {
                     member_id: memberId,
                     pin: userData.pin || '0000',
@@ -179,7 +180,7 @@ export default function MemberDashboard() {
         try {
             const userData = JSON.parse(localStorage.getItem('user'))
             const response = await axios.post(
-                'http://localhost:8000/api/auth/members/update_bank_details/',
+                getFullURL('/auth/members/update_bank_details/'),
                 {
                     member_id: memberId,
                     pin: userData.pin || '0000',
@@ -205,7 +206,7 @@ export default function MemberDashboard() {
         try {
             const userData = JSON.parse(localStorage.getItem('user'))
             const response = await axios.post(
-                'http://localhost:8000/api/auth/members/update_pin/',
+                getFullURL('/auth/members/update_pin/'),
                 {
                     member_id: memberId,
                     nin: userData.nin,
@@ -238,7 +239,7 @@ export default function MemberDashboard() {
         setResetPinLoading(true)
         try {
             const response = await axios.post(
-                'http://localhost:8000/api/auth/members/generate_reset_pin/',
+                getFullURL('/auth/members/generate_reset_pin/'),
                 {
                     member_id: memberId,
                     password: resetPinPassword,
@@ -272,7 +273,7 @@ export default function MemberDashboard() {
         setResetPinLoading(true)
         try {
             const response = await axios.post(
-                'http://localhost:8000/api/auth/members/verify_reset_pin_otp/',
+                getFullURL('/auth/members/verify_reset_pin_otp/'),
                 {
                     member_id: memberId,
                     otp: resetPinOTP
@@ -320,7 +321,7 @@ export default function MemberDashboard() {
             formData.append('profile_picture', profilePictureFile)
 
             const response = await axios.post(
-                'http://localhost:8000/api/auth/members/update_profile_picture/',
+                getFullURL('/auth/members/update_profile_picture/'),
                 formData,
                 {
                     headers: { 'Content-Type': 'multipart/form-data' }
@@ -353,7 +354,7 @@ export default function MemberDashboard() {
         if (idCard) {
             const token = localStorage.getItem('authToken')
             const link = document.createElement('a')
-            link.href = `http://localhost:8000${idCard}`
+            link.href = getFileURL(idCard)
             link.download = `ID_Card_${memberId}.png`
             link.setAttribute('Authorization', `Bearer ${token}`)
             document.body.appendChild(link)
@@ -670,7 +671,7 @@ export default function MemberDashboard() {
                                 <div className="id-card-container">
                                     {idCard ? (
                                         <>
-                                            <img src={`http://localhost:8000${idCard}`} alt="ID Card" className="id-card-image" />
+                                            <img src={getFileURL(idCard)} alt="ID Card" className="id-card-image" />
                                             <div className="id-card-actions">
                                                 <button className="btn-primary" onClick={downloadIDCard}>
                                                     <Download size={20} /> Download ID Card

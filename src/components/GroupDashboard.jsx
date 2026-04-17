@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 import { Users, Settings, Edit2, Trash2, Plus, Upload, ChevronLeft, Save, X, AlertCircle, FileText, Download } from 'lucide-react'
+import { getFullURL, getFileURL } from '../utils/apiConfig'
 import './GroupDashboard.css'
 
 export default function GroupDashboard({ groupId, userRole, onLogout }) {
@@ -41,7 +42,7 @@ export default function GroupDashboard({ groupId, userRole, onLogout }) {
         try {
             setLoading(true)
             const response = await axios.get(
-                'http://localhost:8000/api/auth/groups/dashboard/',
+                getFullURL('/auth/groups/dashboard/'),
                 { params: { group_id: groupId } }
             )
             if (response.data.success) {
@@ -62,7 +63,7 @@ export default function GroupDashboard({ groupId, userRole, onLogout }) {
             setCertError(null)
             console.log(`[Certificate] Loading for group: ${groupId}`)
             const response = await axios.get(
-                'http://localhost:8000/api/auth/groups/get_certificate/',
+                getFullURL('/auth/groups/get_certificate/'),
                 { params: { group_id: groupId } }
             )
             console.log('[Certificate] API Response:', response.data)
@@ -93,7 +94,7 @@ export default function GroupDashboard({ groupId, userRole, onLogout }) {
     const downloadCertificate = () => {
         if (certificate) {
             try {
-                const fullUrl = `http://localhost:8000${certificate}`
+                const fullUrl = getFileURL(certificate)
                 console.log('[Certificate Download] URL:', fullUrl)
                 const link = document.createElement('a')
                 link.href = fullUrl
@@ -126,7 +127,7 @@ export default function GroupDashboard({ groupId, userRole, onLogout }) {
             formData.append('logo', logoFile)
 
             const response = await axios.post(
-                'http://localhost:8000/api/auth/groups/update_logo/',
+                getFullURL('/auth/groups/update_logo/'),
                 formData,
                 { headers: { 'Content-Type': 'multipart/form-data' } }
             )
@@ -150,7 +151,7 @@ export default function GroupDashboard({ groupId, userRole, onLogout }) {
         try {
             setUpdatingAddress(true)
             const response = await axios.post(
-                'http://localhost:8000/api/auth/groups/update_address/',
+                getFullURL('/auth/groups/update_address/'),
                 {
                     group_id: groupId,
                     password: password,
@@ -413,7 +414,7 @@ export default function GroupDashboard({ groupId, userRole, onLogout }) {
                                         <h3>✓ Certificate Available</h3>
                                         <div className="certificate-preview" style={{ marginBottom: '1.5rem', borderRadius: '8px', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
                                             <img
-                                                src={`http://localhost:8000${certificate}`}
+                                                src={getFileURL(certificate)}
                                                 alt="Certificate"
                                                 style={{ maxWidth: '100%', height: 'auto', display: 'block' }}
                                             />

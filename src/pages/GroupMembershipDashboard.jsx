@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './GroupMembershipDashboard.css';
 
-const API_BASE_URL = 'http://localhost:8000/api';
+import { getFullURL } from '../utils/apiConfig';
+
+const API_BASE_URL = getFullURL('');
 
 const GroupMembershipDashboard = ({ groupId }) => {
     const [members, setMembers] = useState([]);

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { LogIn } from 'lucide-react'
 import { setAuthToken, debugAuthStorage } from '../utils/authUtils'
+import { getFullURL } from '../utils/apiConfig'
 
 export default function GroupLogin() {
     const navigate = useNavigate()
@@ -29,7 +30,7 @@ export default function GroupLogin() {
         try {
             // Call login API endpoint
             const response = await axios.post(
-                'http://localhost:8000/api/auth/groups/login/',
+                getFullURL('/auth/groups/login/'),
                 {
                     group_license_number: formData.group_license_number,
                     password: formData.phone_last_four, // API expects password field (last 4 digits)

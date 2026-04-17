@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { LogIn } from 'lucide-react'
 import { setAuthToken, debugAuthStorage } from '../utils/authUtils'
+import { getFullURL } from '../utils/apiConfig'
 
 export default function IndividualLogin() {
     const navigate = useNavigate()
@@ -29,7 +30,7 @@ export default function IndividualLogin() {
         try {
             // Call login API endpoint
             const response = await axios.post(
-                'http://localhost:8000/api/auth/members/login/',
+                getFullURL('/auth/members/login/'),
                 {
                     abia_arise_id: formData.abia_arise_id,
                     password: formData.phone_last_four, // API expects password field

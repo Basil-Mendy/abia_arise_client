@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 import { Mail, Send } from 'lucide-react'
+import { getFullURL } from '../../utils/apiConfig'
 import './MessagingSystem.css'
 
 export default function MessagingSystem() {
@@ -32,8 +33,8 @@ export default function MessagingSystem() {
             const headers = { Authorization: `Bearer ${token}` }
 
             const [membersRes, groupsRes] = await Promise.all([
-                axios.get('http://localhost:8000/api/auth/members/', { headers }),
-                axios.get('http://localhost:8000/api/auth/groups/', { headers })
+                axios.get(getFullURL('/auth/members/'), { headers }),
+                axios.get(getFullURL('/auth/groups/'), { headers })
             ])
 
             // Handle both paginated responses (object with .results) and plain arrays
@@ -151,7 +152,7 @@ export default function MessagingSystem() {
             setLoading(true)
 
             await axios.post(
-                'http://localhost:8000/api/messaging/send-email/',
+                getFullURL('/messaging/send-email/'),
                 {
                     recipients: recipients,
                     subject: messageData.subject,

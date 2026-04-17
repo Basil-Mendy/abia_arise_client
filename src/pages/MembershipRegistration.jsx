@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import './MembershipRegistration.css';
 
-const API_BASE_URL = 'http://localhost:8000/api';
+import { getFullURL } from '../utils/apiConfig';
+
+const API_BASE_URL = getFullURL('');
 
 const MembershipRegistration = () => {
     const [step, setStep] = useState('check'); // check, form, complete

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 import { X, Shield, Trash2, Plus } from 'lucide-react'
+import { getFullURL } from '../../utils/apiConfig'
 import './GroupManagement.css'
 
 export default function GroupManagement() {
@@ -21,7 +22,7 @@ export default function GroupManagement() {
     const fetchGroups = async () => {
         try {
             setLoading(true)
-            const response = await axios.get('http://localhost:8000/api/auth/groups/', {
+            const response = await axios.get(getFullURL('/auth/groups/'), {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem('authToken')}`
                 }
@@ -62,7 +63,7 @@ export default function GroupManagement() {
 
         try {
             await axios.patch(
-                `http://localhost:8000/api/auth/group-members/${selectedMember.id}/`,
+                getFullURL(`/auth/group-members/${selectedMember.id}/`),
                 { role: newRole },
                 {
                     headers: {
@@ -83,7 +84,7 @@ export default function GroupManagement() {
 
         try {
             await axios.delete(
-                `http://localhost:8000/api/auth/group-members/${memberId}/`,
+                getFullURL(`/auth/group-members/${memberId}/`),
                 {
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem('authToken')}`

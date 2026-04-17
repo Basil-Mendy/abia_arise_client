@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { ChevronRight } from 'lucide-react'
+import { getFullURL } from '../utils/apiConfig'
 import './OurLeadership.css'
 
 export default function OurLeadership() {
@@ -16,7 +17,7 @@ export default function OurLeadership() {
     const fetchLeaders = async () => {
         try {
             const response = await axios.get(
-                'http://localhost:8000/api/core/leadership/',
+                getFullURL('/core/leadership/'),
                 { params: { level: 'state' } }
             )
             // Get first 10 state-level leaders

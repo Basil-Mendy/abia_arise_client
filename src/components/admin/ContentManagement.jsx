@@ -108,7 +108,7 @@ export default function ContentManagement() {
                 if (leaderFormData.lga) data.append('lga', leaderFormData.lga)
                 if (leaderFormData.ward) data.append('ward', leaderFormData.ward)
 
-                await axios.post('http://localhost:8000/api/core/leadership/', data, {
+                await axios.post(getFullURL('/core/leadership/'), data, {
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem('authToken')}`,
                         'Content-Type': 'multipart/form-data'
@@ -168,8 +168,8 @@ export default function ContentManagement() {
                 }
 
                 const endpoint = contentType === 'news'
-                    ? 'http://localhost:8000/api/core/news/'
-                    : 'http://localhost:8000/api/core/achievements/'
+                    ? getFullURL('/core/news/')
+                    : getFullURL('/core/achievements/')
 
                 await axios.post(endpoint, data, {
                     headers: {

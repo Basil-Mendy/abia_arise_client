@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { LogIn } from 'lucide-react'
 import { setAuthToken, debugAuthStorage } from '../utils/authUtils'
+import { getFullURL } from '../utils/apiConfig'
 
 export default function AdminLogin() {
     const navigate = useNavigate()
@@ -30,7 +31,7 @@ export default function AdminLogin() {
             console.log('Attempting admin login...')
             // Call admin login API endpoint
             const response = await axios.post(
-                'http://localhost:8000/api/auth/admin/login/',
+                getFullURL('/auth/admin/login/'),
                 {
                     email: formData.email,
                     password: formData.password,
