@@ -84,7 +84,7 @@ export default function GroupDashboard() {
         try {
             console.log('Fetching group data for groupId:', groupId)
             const response = await axios.get(
-                getFullURL('/auth/groups/dashboard/'),
+                getFullURL('/api/auth/groups/dashboard/'),
                 { params: { group_id: groupId } }
             )
             console.log('Group data response:', response.data)
@@ -138,7 +138,7 @@ export default function GroupDashboard() {
 
         try {
             const response = await axios.post(
-                getFullURL('/auth/groups/upload_members/'),
+                getFullURL('/api/auth/groups/upload_members/'),
                 formData,
                 { headers: { 'Content-Type': 'multipart/form-data' } }
             )
@@ -180,7 +180,7 @@ export default function GroupDashboard() {
             })
 
             const response = await axios.post(
-                getFullURL('/auth/groups/download_certificate/'),
+                getFullURL('/api/auth/groups/download_certificate/'),
                 {
                     group_id: groupId,
                     password: resetPinInput
@@ -232,7 +232,7 @@ export default function GroupDashboard() {
 
         try {
             const response = await axios.post(
-                getFullURL('/auth/groups/delete_excel_file/'),
+                getFullURL('/api/auth/groups/delete_excel_file/'),
                 {
                     group_id: groupId,
                     password: resetPinInput
@@ -270,7 +270,7 @@ export default function GroupDashboard() {
 
             try {
                 const response = await axios.post(
-                    getFullURL('/auth/groups/generate_reset_pin/'),
+                    getFullURL('/api/auth/groups/generate_reset_pin/'),
                     {
                         group_id: groupId,
                         password: userPassword,
@@ -299,7 +299,7 @@ export default function GroupDashboard() {
 
             try {
                 const response = await axios.post(
-                    getFullURL('/auth/groups/verify_reset_pin_otp/'),
+                    getFullURL('/api/auth/groups/verify_reset_pin_otp/'),
                     {
                         group_id: groupId,
                         otp: otpInput

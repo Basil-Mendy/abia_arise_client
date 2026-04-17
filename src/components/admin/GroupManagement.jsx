@@ -22,7 +22,7 @@ export default function GroupManagement() {
     const fetchGroups = async () => {
         try {
             setLoading(true)
-            const response = await axios.get(getFullURL('/auth/groups/'), {
+            const response = await axios.get(getFullURL('/api/auth/groups/'), {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem('authToken')}`
                 }
@@ -63,7 +63,7 @@ export default function GroupManagement() {
 
         try {
             await axios.patch(
-                getFullURL(`/auth/group-members/${selectedMember.id}/`),
+                getFullURL(`/api/auth/group-members/${selectedMember.id}/`),
                 { role: newRole },
                 {
                     headers: {
@@ -84,7 +84,7 @@ export default function GroupManagement() {
 
         try {
             await axios.delete(
-                getFullURL(`/auth/group-members/${memberId}/`),
+                getFullURL(`/api/auth/group-members/${memberId}/`),
                 {
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem('authToken')}`

@@ -183,7 +183,7 @@ export default function IndividualRegistration({ onBack }) {
                     if (name === 'phoneNumber') checkData.phone_number = value
 
                     const response = await axios.post(
-                        getFullURL('/auth/members/check_duplicate/'),
+                        getFullURL('/api/auth/members/check_duplicate/'),
                         JSON.stringify(checkData),
                         {
                             headers: {
@@ -296,7 +296,7 @@ export default function IndividualRegistration({ onBack }) {
 
             // Submit registration to backend
             const response = await axios.post(
-                getFullURL('/auth/members/register/'),
+                getFullURL('/api/auth/members/register/'),
                 formDataToSend,
                 {
                     headers: {
@@ -318,7 +318,7 @@ export default function IndividualRegistration({ onBack }) {
                 // Generate ID card
                 try {
                     const idCardResponse = await axios.post(
-                        getFullURL('/auth/members/generate_id_card/'),
+                        getFullURL('/api/auth/members/generate_id_card/'),
                         { member_id: memberId }
                     )
 

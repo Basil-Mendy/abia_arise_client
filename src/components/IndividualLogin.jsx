@@ -30,7 +30,7 @@ export default function IndividualLogin() {
         try {
             // Call login API endpoint
             const response = await axios.post(
-                getFullURL('/auth/members/login/'),
+                getFullURL('/api/auth/members/login/'),
                 {
                     abia_arise_id: formData.abia_arise_id,
                     password: formData.phone_last_four, // API expects password field

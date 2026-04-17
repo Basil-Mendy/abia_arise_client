@@ -30,7 +30,7 @@ export default function GroupLogin() {
         try {
             // Call login API endpoint
             const response = await axios.post(
-                getFullURL('/auth/groups/login/'),
+                getFullURL('/api/auth/groups/login/'),
                 {
                     group_license_number: formData.group_license_number,
                     password: formData.phone_last_four, // API expects password field (last 4 digits)

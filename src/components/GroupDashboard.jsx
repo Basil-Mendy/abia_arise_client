@@ -42,7 +42,7 @@ export default function GroupDashboard({ groupId, userRole, onLogout }) {
         try {
             setLoading(true)
             const response = await axios.get(
-                getFullURL('/auth/groups/dashboard/'),
+                getFullURL('/api/auth/groups/dashboard/'),
                 { params: { group_id: groupId } }
             )
             if (response.data.success) {
@@ -63,7 +63,7 @@ export default function GroupDashboard({ groupId, userRole, onLogout }) {
             setCertError(null)
             console.log(`[Certificate] Loading for group: ${groupId}`)
             const response = await axios.get(
-                getFullURL('/auth/groups/get_certificate/'),
+                getFullURL('/api/auth/groups/get_certificate/'),
                 { params: { group_id: groupId } }
             )
             console.log('[Certificate] API Response:', response.data)
@@ -127,7 +127,7 @@ export default function GroupDashboard({ groupId, userRole, onLogout }) {
             formData.append('logo', logoFile)
 
             const response = await axios.post(
-                getFullURL('/auth/groups/update_logo/'),
+                getFullURL('/api/auth/groups/update_logo/'),
                 formData,
                 { headers: { 'Content-Type': 'multipart/form-data' } }
             )
@@ -151,7 +151,7 @@ export default function GroupDashboard({ groupId, userRole, onLogout }) {
         try {
             setUpdatingAddress(true)
             const response = await axios.post(
-                getFullURL('/auth/groups/update_address/'),
+                getFullURL('/api/auth/groups/update_address/'),
                 {
                     group_id: groupId,
                     password: password,

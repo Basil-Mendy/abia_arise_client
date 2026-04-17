@@ -31,7 +31,7 @@ export default function AdminLogin() {
             console.log('Attempting admin login...')
             // Call admin login API endpoint
             const response = await axios.post(
-                getFullURL('/auth/admin/login/'),
+                getFullURL('/api/auth/admin/login/'),
                 {
                     email: formData.email,
                     password: formData.password,

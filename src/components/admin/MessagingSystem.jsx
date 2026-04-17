@@ -33,8 +33,8 @@ export default function MessagingSystem() {
             const headers = { Authorization: `Bearer ${token}` }
 
             const [membersRes, groupsRes] = await Promise.all([
-                axios.get(getFullURL('/auth/members/'), { headers }),
-                axios.get(getFullURL('/auth/groups/'), { headers })
+                axios.get(getFullURL('/api/auth/members/'), { headers }),
+                axios.get(getFullURL('/api/auth/groups/'), { headers })
             ])
 
             // Handle both paginated responses (object with .results) and plain arrays

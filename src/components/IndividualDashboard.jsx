@@ -53,7 +53,7 @@ export default function IndividualDashboard({ memberId, onLogout }) {
         try {
             setLoading(true)
             const response = await axios.get(
-                getFullURL('/auth/members/dashboard/'),
+                getFullURL('/api/auth/members/dashboard/'),
                 { params: { member_id: memberId } }
             )
             if (response.data.success) {
@@ -83,7 +83,7 @@ export default function IndividualDashboard({ memberId, onLogout }) {
             setIdCardError(null)
             console.log(`[ID Card] Loading for member: ${memberId}`)
             const response = await axios.get(
-                getFullURL('/auth/members/get_id_card/'),
+                getFullURL('/api/auth/members/get_id_card/'),
                 { params: { member_id: memberId } }
             )
             console.log('[ID Card] API Response:', response.data)
@@ -143,7 +143,7 @@ export default function IndividualDashboard({ memberId, onLogout }) {
             formData.append('profile_picture', profilePictureFile)
 
             const response = await axios.post(
-                getFullURL('/auth/members/update_profile_picture/'),
+                getFullURL('/api/auth/members/update_profile_picture/'),
                 formData,
                 { headers: { 'Content-Type': 'multipart/form-data' } }
             )
@@ -167,7 +167,7 @@ export default function IndividualDashboard({ memberId, onLogout }) {
         try {
             setUpdatingResidential(true)
             const response = await axios.post(
-                getFullURL('/auth/members/update_residential_info/'),
+                getFullURL('/api/auth/members/update_residential_info/'),
                 {
                     member_id: memberId,
                     pin: pin,
@@ -193,7 +193,7 @@ export default function IndividualDashboard({ memberId, onLogout }) {
         try {
             setUpdatingBank(true)
             const response = await axios.post(
-                getFullURL('/auth/members/update_bank_details/'),
+                getFullURL('/api/auth/members/update_bank_details/'),
                 {
                     member_id: memberId,
                     pin: pin,
@@ -222,7 +222,7 @@ export default function IndividualDashboard({ memberId, onLogout }) {
         try {
             setUpdatingPin(true)
             const response = await axios.post(
-                getFullURL('/auth/members/update_pin/'),
+                getFullURL('/api/auth/members/update_pin/'),
                 {
                     member_id: memberId,
                     nin: pinData.nin,

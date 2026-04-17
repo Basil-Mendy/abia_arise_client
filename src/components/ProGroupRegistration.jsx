@@ -186,7 +186,7 @@ export default function ProGroupRegistration({ onBack }) {
 
             // Submit registration to backend
             const response = await axios.post(
-                getFullURL('/auth/groups/register/'),
+                getFullURL('/api/auth/groups/register/'),
                 data,
                 {
                     headers: {
@@ -208,7 +208,7 @@ export default function ProGroupRegistration({ onBack }) {
                 // Generate certificate
                 try {
                     const certResponse = await axios.post(
-                        getFullURL('/auth/groups/generate_certificate/'),
+                        getFullURL('/api/auth/groups/generate_certificate/'),
                         { group_id: groupId }
                     )
 
